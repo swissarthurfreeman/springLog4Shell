@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <link rel="stylesheet" href="bootstrap.css">
+</head>
+<body>
+    <br><br>
+    <div class="container">
+        <div class="jumbotron bg-dark text-white">
+            <div class="container" style="padding-bottom: 20px;">
+                <form data-bitwarden-watching="1">
+                    <fieldset>
+                        <legend>Login to the Biscuit Shop !</legend>
+                        <div>
+                            <label for="exampleInputEmail1" class="form-label mt-4">Email address</label>
+                            <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter email">
+                            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                        </div>
+                        <div>
+                            <label for="exampleInputPassword1" class="form-label mt-4">Password</label>
+                            <input type="password" class="form-control" id="inputPassword" placeholder="Password" autocomplete="off">
+                        </div>
+                        <br>
+                        <button type="button" class="btn btn-secondary my-2 my-sm-0">Login</button>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>    
+<script>
+    const button = document.querySelector("button");
+
+    button.addEventListener("click", logIn);
+    function reqListener() {
+        console.log("Response Received :");
+        console.log(this.responseText);
+    }
+
+    function logIn() {
+        const email = document.getElementById("inputEmail").value;
+        const password = document.getElementById("inputPassword").value;
+        console.log(email, password);
+        
+        const req = new XMLHttpRequest();
+        
+        req.addEventListener("load", reqListener);
+        req.open("POST", `http://localhost:8080/users`, true);
+        req.setRequestHeader("Content-Type", "application/json");
+        var data = JSON.stringify({
+            "email": email,
+            "password": password
+        });
+        req.send(data);
+    }
+</script>
+</html>
