@@ -9,7 +9,7 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>ch.unige</groupId>
-	<artifactId>biscuits</artifactId>
+	<artifactId>biscuits-application</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<name>biscuits</name>
 	<description>Freeman&apos;s Log4Shell vulnerable Biscuits API</description>
