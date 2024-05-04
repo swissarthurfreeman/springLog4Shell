@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import ch.unige.biscuits.domain.User;
+import ch.unige.biscuits.domain.Order;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -19,17 +19,19 @@ import org.apache.logging.log4j.core.net.JndiManager;
 import org.apache.logging.log4j.core.lookup.JndiLookup;
 
 @RestController
-@RequestMapping("/users")
-public class UserController {
+@RequestMapping("/orders")
+public class OrdersController {
     private static Logger logger = LogManager.getLogger();
     
     @PostMapping("")
     @CrossOrigin
-    public HttpEntity<Optional<User>> get(@RequestBody User user) {
+    public HttpEntity<Optional<Order>> get(@RequestBody Order order) {
+        logger.info("Order :" + order.email + order.location);
+        logger.info(order.biscuits);
         //logger.info("Trying to lookup..."); benspassword
-        System.setProperty("com.sun.jndi.ldap.object.trustURLCodebase","true");
-        logger.info("${jndi:ldap://localhost:1389/a}");
-        System.out.println("Ok");
+        //System.setProperty("com.sun.jndi.ldap.object.trustURLCodebase","true");
+        //logger.info("${jndi:ldap://localhost:1389/a}");
+        //System.out.println("Ok");
         /*JndiManager jndiManager = JndiManager.getDefaultManager();
         try {
             Object obj = jndiManager.lookup("ldap://0.0.0.0:1389/dc=example,dc=com");

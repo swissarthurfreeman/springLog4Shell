@@ -9,49 +9,157 @@
         <div class="jumbotron bg-dark text-white">
             <div class="container" style="padding-bottom: 20px;">
                 <form data-bitwarden-watching="1">
-                    <fieldset>
-                        <legend>Login to the Biscuit Shop !</legend>
-                        <div>
-                            <label for="exampleInputEmail1" class="form-label mt-4">Email address</label>
-                            <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp" placeholder="Enter email">
-                            <small id="emailHelp" class="form-text text-muted">We'll never share your email with anyone else.</small>
+                    <legend>Order some biscuits from Unige's catering service !</legend>
+                    <div class="row">
+                        <div class="col">
+                            <div>
+                                <label for="inputEmail" class="form-label mt-4">Contact Email</label>
+                                <input type="email" class="form-control" id="inputEmail" aria-describedby="emailHelp"
+                                    placeholder="Enter email">
+                            </div>
                         </div>
-                        <div>
-                            <label for="exampleInputPassword1" class="form-label mt-4">Password</label>
-                            <input type="password" class="form-control" id="inputPassword" placeholder="Password" autocomplete="off">
+                        <div class="col">
+                            <div>
+                                <label for="inputLocation" class="form-label mt-4">Physical Location</label>
+                                <input type="email" class="form-control" id="inputLocation" aria-describedby="emailHelp"
+                                    placeholder="Enter email">
+                            </div>
                         </div>
-                        <br>
-                        <button type="button" class="btn btn-secondary my-2 my-sm-0">Login</button>
-                    </fieldset>
+                    </div>
+                    <hr>
+                    <legend>Biscuits Selection</legend>
+                    <br>
+                    <div class="row" id="biscuitsSelection">
+                        <!-- GET biscuits and insert here -->
+                    </div>
+                    <br>
+                    <legend>Cart :</legend>
+                    <hr>
+                    <div class="row" id="cart">
+                        <!-- Insert selections via script -->
+                    </div>
+                    <hr>
+                    <button type="button" id="orderButton" class="btn btn-success my-4 my-sm-0">Order Now !</button>
+                    <hr>
+                    <div class="row" id="confirmations">
+
+                    </div>
                 </form>
             </div>
         </div>
     </div>
-</body>    
+</body>
 <script>
-    const button = document.querySelector("button");
 
-    button.addEventListener("click", logIn);
-    function reqListener() {
-        console.log("Response Received :");
+    function biscuitsListener() {
+        var response = JSON.parse(this.responseText);
+        console.log("response :", response);
+        for (let biscuit of response) {
+
+            var html = `
+            <div class="col">
+                <div class="card text-white bg-primary mb-3" style="max-width: 20rem;">
+                    <div class="card-body">
+                        <h4 class="card-title">${biscuit.name}</h4>
+                        <img src="${biscuit.image}" style="width: 100%;">
+                        <p class="card-text">${biscuit.description}</p>
+                        <button type="button" class="btn btn-success" onclick="addToCart('${biscuit.name}')">Add a Box to Cart</button>
+                    </div>
+                </div>
+            </div>
+            `
+            appendHtml(document.getElementById('biscuitsSelection'), html);
+        }
+    }
+
+    function getBiscuits() {
+        const req = new XMLHttpRequest();
+
+        req.addEventListener("load", biscuitsListener);
+
+        req.open("GET", `http://localhost:8080/biscuits`, true);
+        req.setRequestHeader("Content-Type", "application/json");
+        req.send();
+    }
+
+    getBiscuits()
+
+    function appendHtml(el, str) {
+        var div = document.createElement('div');
+        div.innerHTML = str;
+        while (div.children.length > 0) {
+            el.appendChild(div.children[0]);
+        }
+    }
+
+    var cart = [];
+
+    function addToCart(biscuit) {
+        if (cart.indexOf(biscuit) === -1) {
+            cart.push(biscuit);
+            var html = `
+            <div class="col" id="${biscuit}">
+                <div class="toast show" role="alert" aria-live="assertive" aria-atomic="true">
+                    <div class="toast-header">
+                        <strong class="me-auto">Box of ${biscuit}</strong>
+                        <button type="button" class="btn-close ms-2 mb-1" data-bs-dismiss="toast" aria-label="Close" onclick="remove('${biscuit}')">
+                            <span aria-hidden="true"></span>
+                        </button>
+                    </div>
+                    <div class="toast-body">
+                        Excellent choice...
+                    </div>
+                </div>    
+            </col>`;
+            appendHtml(document.getElementById('cart'), html); // "body" has two more children - h1 and span.
+        }
+    }
+
+    const button = document.getElementById("orderButton");
+    button.addEventListener("click", order);
+
+    function orderListener() {
         console.log(this.responseText);
     }
 
-    function logIn() {
+    function order() {
+        for (let biscuit of cart) {
+            document.getElementById(biscuit).remove();
+        }
+        appendHtml(
+            document.getElementById('confirmations'),
+            `<div class="alert alert-dismissible alert-success">
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                <strong>You order has been placed !</strong> You may lay back and wait for these delicious biscuits to get to you :)
+            </div>`
+        )
+
         const email = document.getElementById("inputEmail").value;
-        const password = document.getElementById("inputPassword").value;
-        console.log(email, password);
-        
+        const location = document.getElementById("inputLocation").value;
+
+        console.log("Building order for :", email, "at", location);
+
         const req = new XMLHttpRequest();
-        
-        req.addEventListener("load", reqListener);
-        req.open("POST", `http://localhost:8080/users`, true);
+
+        req.addEventListener("load", orderListener);
+
+        req.open("POST", `http://localhost:8080/orders`, true);
         req.setRequestHeader("Content-Type", "application/json");
         var data = JSON.stringify({
             "email": email,
-            "password": password
+            "location": location,
+            "biscuits": cart
         });
+
         req.send(data);
+        cart = [];
+    }
+
+    function remove(biscuit) {
+        document.getElementById(biscuit).remove();
+        var idx = cart.indexOf(biscuit);
+        cart.splice(idx, 1);
     }
 </script>
+
 </html>
