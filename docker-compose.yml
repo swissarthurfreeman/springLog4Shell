@@ -1,11 +1,49 @@
 version: '3.1'
 
 services:
+  application:
+    image: biscuits-application
+    ports:
+      - 8080:8080
+    networks:
+      - persistence
+    environment:
+      - MYSQL_HOST=mysql-database
+      - MYSQL_PORT=${MYSQL_PORT}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - LDAP_BASE_DN=${LDAP_BASE_DN}
+      - LDAP_PORT=${LDAP_PORT}
+      - LDAP_LDIF_FILE=${LDAP_LDIF_FILE}
+    restart: always
+  
   database:
     image: mysql
     ports:
       - 3306:3306
-
+    container_name: mysql-database
     environment:
-      MYSQL_ROOT_PASSWORD: super_duper_secret
-      MYSQL_DATABASE: biscuits
+      - MYSQL_ROOT_PASSWORD=${MYSQL_ROOT_PASSWORD}
+      - MYSQL_DATABASE=${MYSQL_DATABASE}
+    networks:
+      - persistence
+  
+  # TODO : pass environment variables for java socket opening etc.
+  snoopy-http-server:
+    container_name: snoopy-http-server
+    image: snoopy-http-server
+    ports:
+      - 8000:8000
+    networks:
+      - persistence
+  
+  snoopy-ldap-server:
+    container_name: snoopy-ldap-server
+    image: snoopy-ldap-server
+    ports:
+      - 1389:1389
+    networks:
+      - persistence
+
+networks:
+  persistence:

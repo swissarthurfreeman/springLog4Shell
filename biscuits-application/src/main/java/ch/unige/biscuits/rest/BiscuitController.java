@@ -24,17 +24,17 @@ public class BiscuitController {
     @GetMapping("")
     @CrossOrigin
     public HttpEntity<List<Biscuit>> list() {
-        var b1 = new Biscuit();
+        Biscuit b1 = new Biscuit();
         b1.name = "Kambly Classic";
         b1.description = "A Swiss favorite, Kambly classic are known for their sweet wholesome taste.";
         b1.image = "./kambly.png";
 
-        var b2 = new Biscuit();
+        Biscuit b2 = new Biscuit();
         b2.name = "Basler Lekerli";
         b2.description = "A Swiss German classic, Lekerli are known for being an acquired taste that stays.";
         b2.image = "./lakerli.png";
         
-        var b3 = new Biscuit();
+        Biscuit b3 = new Biscuit();
         b3.name = "Basler Brunsli";
         b3.description = "A Christmas standard, these biscuits will satisfy the sweetest-toothed amongst us!";
         b3.image = "./brunsli.png";

@@ -1,1 +1,3 @@
 ch/unige/ldap/App.class
+ch/unige/ldap/MaliciousLDAPServer$OperationInterceptor.class
+ch/unige/ldap/MaliciousLDAPServer.class

