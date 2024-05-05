@@ -7,6 +7,7 @@ ADD ./src/ /app/src
 
 RUN mvn package
 
+EXPOSE 8389
 EXPOSE 8080
 
 CMD ["mvn", "spring-boot:run"]

