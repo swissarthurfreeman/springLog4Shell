@@ -46,5 +46,11 @@ services:
     networks:
       - persistence
 
+  snoopy-netcat-listener:
+    container_name: snoopy-netcat-listener
+    image: snoopy-netcat-listener
+    networks:
+      - persistence
+
 networks:
   persistence:

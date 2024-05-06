@@ -6,7 +6,7 @@ WORKDIR /app
 COPY pom.xml /app
 ADD src /app/src
 
-RUN mvn clean compile assembly:single
+RUN mvn compile assembly:single
 
 EXPOSE 1389
 
