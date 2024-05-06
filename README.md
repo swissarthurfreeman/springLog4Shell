@@ -19,7 +19,14 @@ Access the malicious http server at `http://localhost:8000`
 
 ### Remote Shell Exploit
 
-Startup a netcat server to listen for an incoming TCP remote shell connection `docker run -it snoopy-netcat-listener -lvnp 9001`.
+Startup a netcat server to listen for an incoming TCP remote shell connection `docker run snoopy-netcat-listener`, once pwned,
+you can get .env values via, 
+```
+echo $MYSQL_HOST
+mysql-database
+echo $MYSQL_ROOT_PASSWORD 
+secret
+```
 
 Dependencies : 
 

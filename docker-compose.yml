@@ -48,6 +48,9 @@ services:
 
   snoopy-netcat-listener:
     container_name: snoopy-netcat-listener
+    stdin_open: true
+    tty: true
+    command: -lvnp 9001
     image: snoopy-netcat-listener
     networks:
       - persistence
